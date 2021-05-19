@@ -18,7 +18,8 @@ const CategoryController = {
 
       const category = await Category.find({ name });
 
-      if (category.length != 0) throw "Category already exist";
+      if (category.length != 0)
+        throw { name: "existError", message: "Already exist" };
 
       const newCategory = new Category({
         name,
@@ -36,15 +37,13 @@ const CategoryController = {
         .status(201)
         .json({ error: false, message: "Category was created" })
         .end();
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
-      return res
-        .status(400)
-        .json({
-          error: true,
-          message,
-        })
-        .end();
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
+      next(error);
     }
   },
 
@@ -68,9 +67,7 @@ const CategoryController = {
         })
         .end();
     } catch (error) {
-      return res
-        .status(500)
-        .json({ error: true, message: "Something was wrong" });
+      next(error);
     }
   },
   oneCategory: async (req, res, next) => {
@@ -99,14 +96,18 @@ const CategoryController = {
           subjects,
         })
         .end();
-    } catch (err) {
-      const message = err?.details ? err.detailts[0].message : err.name;
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
 
-      return res.status(404).json({ error: true, message });
+      error = { name, message };
+      next(error);
     }
   },
 
-  update: async (req, res) => {
+  update: async (req, res, next) => {
     try {
       await validateUpdate(req.body);
 
@@ -116,7 +117,8 @@ const CategoryController = {
         $or: [{ _id }, { name: req.body?.name }],
       });
 
-      if (!category || category.length != 1) throw "Something was wrong";
+      if (!category || category.length != 1)
+        throw { name: "updateError", message: "Cannot update" };
 
       const updatedCategory = {
         name: req.body.name || category.name,
@@ -129,48 +131,48 @@ const CategoryController = {
         error: false,
         message: "Category was updated",
       });
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
 
-      return res.status(500).json({
-        error: true,
-        message,
-      });
+      next(error);
     }
   },
-  deleteOne: async (req, res) => {
+  deleteOne: async (req, res, next) => {
     try {
       await validateDelete(req.params);
       const { id } = req.params;
 
       const category = await Category.findById(id);
 
-      if (!category) throw "Category does not exist";
+      if (!category) throw { name: "deleteError", message: "Cannot delete" };
 
       await Category.findOneAndDelete(id);
 
       return res
         .status(200)
         .json({ error: false, message: "Category deleted" });
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
 
-      return res.status(500).json({
-        error: true,
-        message,
-      });
+      next(error);
     }
   },
-  deleteAll: async (req, res) => {
+  deleteAll: async (req, res, next) => {
     try {
       await Category.deleteMany({});
       return res
         .status(200)
         .json({ error: false, message: "Categories was deleted" });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ error: true, message: "Something was wrong" });
+    } catch (error) {
+      next(error);
     }
   },
 };
