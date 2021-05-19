@@ -14,9 +14,10 @@ const SubjectController = {
       await validateSubjectBody(req.body);
       const { name, categoryId } = req.body;
 
-      const subjects = await Subject.find({ name });
+      const subject = await Subject.findOne({ name });
 
-      if (!subjects) throw "Subject already exist";
+      if (subject)
+        throw { name: "existError", message: "Subject already exist" };
 
       const category = await Category.findById(categoryId);
 
@@ -43,14 +44,17 @@ const SubjectController = {
           message: "Subject was created sucessfuly",
         })
         .end();
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
-
-      return res.status(400).json({ error: true, message });
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
+      next(error);
     }
   },
 
-  allSubjects: async (req, res) => {
+  allSubjects: async (req, res, next) => {
     try {
       const subjects = await Subject.find({});
 
@@ -66,10 +70,8 @@ const SubjectController = {
         subjectCount: mappedSubjects.length,
         results: mappedSubjects,
       });
-    } catch (err) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Cannot get subjects" });
+    } catch (error) {
+      next(error);
     }
   },
   oneSubject: async (req, res, next) => {
@@ -78,8 +80,6 @@ const SubjectController = {
       const { id } = req.params;
 
       const subject = await Subject.findById(id);
-
-      if (!subject) next();
 
       const { name, categoryId, courses } = subject;
 
@@ -91,57 +91,67 @@ const SubjectController = {
         courseCount: courses.length,
         courses,
       });
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err.name;
-
-      return res.status(500).json({
-        error: true,
-        message,
-      });
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
+      next(error);
     }
   },
 
-  update: async (req, res) => {
+  update: async (req, res, next) => {
     try {
       await validateUpdate(req.body);
 
       const { id } = req.body;
 
-      const subject = await Subject.find({
+      const subjects = await Subject.find({
         $or: [{ id }, { name: req.body?.name }],
       });
+      console.log({ subjects });
 
-      if (!subject || subject.length != 1) throw "cannot update subject";
+      if (subjects.length || subjects.length >= 1)
+        throw { name: "updateError", message: "Cannot update subject" };
+
+      const subject = await Subject.findById(id);
+      console.log({ subject });
 
       const updatedSubject = {
         name: req.body.name || subject.name,
         url: req.body.url || subject.url,
       };
 
-      await Subject.findOneAndUpdate(id, updatedSubject);
+      await Subject.findOneAndUpdate({ _id: subject._id }, updatedSubject);
 
-      return res.status(200).json({
-        error: false,
-        message: "Subject was updated",
-      });
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
+      return res
+        .status(200)
+        .json({
+          error: false,
+          message: "Subject was updated",
+        })
+        .end();
+    } catch (error) {
+      const name = error?.details
+        ? error.details[0].type.split(".")[1]
+        : error.name;
+      const message = error?.details ? error.details[0].message : error.message;
+      error = { name, message };
 
-      return res.status(500).json({
-        error: true,
-        message,
-      });
+      next(error);
     }
   },
 
-  deleteOne: async (req, res) => {
+  deleteOne: async (req, res, next) => {
     try {
       await validateDelete(req.params);
       const { id } = req.params;
 
       const subject = await Subject.findById(id);
 
-      if (!subject) throw "Subject does exist";
+      if (!subject)
+        throw { name: "deleteError", message: "Cannot delete subject" };
 
       await Subject.findOneAndDelete(id);
 
@@ -149,25 +159,18 @@ const SubjectController = {
         error: false,
         message: "Subject was delete",
       });
-    } catch (err) {
-      const message = err?.details ? err.details[0].message : err;
-
-      return res.status(500).json({
-        error: true,
-        message,
-      });
+    } catch (error) {
+      next(error);
     }
   },
-  deleteAll: async (req, res) => {
+  deleteAll: async (req, res, next) => {
     try {
       await Subject.deleteMany({});
       return res
         .status(200)
         .json({ error: false, message: "Subjects was deleted" });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ error: true, message: "Something was wrong" });
+    } catch (error) {
+      next(error);
     }
   },
 };

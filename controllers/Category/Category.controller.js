@@ -113,12 +113,17 @@ const CategoryController = {
 
       const { _id } = req.body;
 
-      const category = await Category.find({
+      const categories = await Category.find({
         $or: [{ _id }, { name: req.body?.name }],
       });
 
-      if (!category || category.length != 1)
-        throw { name: "updateError", message: "Cannot update" };
+      console.log({ categories });
+
+      if (categories.length === 0 || categories.length != 1)
+        throw { name: "updateError", message: "Cannot update categories" };
+
+      const category = await Category.findById(_id);
+      console.log({ category });
 
       const updatedCategory = {
         name: req.body.name || category.name,
@@ -126,11 +131,15 @@ const CategoryController = {
         imgUrl: req.body.imgUrl || category.imgUrl,
       };
 
-      await Category.findOneAndUpdate(_id, updatedCategory);
-      return res.status(200).json({
-        error: false,
-        message: "Category was updated",
-      });
+      await Category.findOneAndUpdate({ _id: category._id }, updatedCategory);
+
+      return res
+        .status(200)
+        .json({
+          error: false,
+          message: "Category was updated",
+        })
+        .end();
     } catch (error) {
       const name = error?.details
         ? error.details[0].type.split(".")[1]
