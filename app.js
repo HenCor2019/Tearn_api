@@ -9,6 +9,7 @@ var usersRouter = require("./routes/users");
 var categoryRouter = require("./routes/Category/Category.router");
 var subjectRouter = require("./routes/Subject/Subject.router");
 const notFound = require("./middlewares/NotFound.middleware");
+const handleErrors = require("./middlewares/handleError.middleware");
 
 database.connect();
 var app = express();
@@ -26,5 +27,6 @@ app.use("/api/v1/subject", subjectRouter);
 app.use("/api/v1/subject", subjectRouter);
 
 app.use(notFound);
+app.use(handleErrors);
 
 module.exports = app;
