@@ -8,6 +8,9 @@ const ERROR_HANDLERS = {
   required: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 
+  base: (res, { message }) =>
+    res.status(400).json({ error: true, message }).end(),
+
   existError: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 

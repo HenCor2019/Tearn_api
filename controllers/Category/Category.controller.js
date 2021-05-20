@@ -1,4 +1,5 @@
 const Category = require("../../models/Category.model");
+const parseError = require("../../utils/parseError");
 const {
   validateCreation,
   validateOneCategory,
@@ -19,7 +20,7 @@ const CategoryController = {
       const category = await Category.find({ name });
 
       if (category.length != 0)
-        throw { name: "existError", message: "Already exist" };
+        throw { name: "existError", message: "category already exist" };
 
       const newCategory = new Category({
         name,
@@ -38,12 +39,7 @@ const CategoryController = {
         .json({ error: false, message: "Category was created" })
         .end();
     } catch (error) {
-      const name = error?.details
-        ? error.details[0].type.split(".")[1]
-        : error.name;
-      const message = error?.details ? error.details[0].message : error.message;
-      error = { name, message };
-      next(error);
+      next(parseError(error));
     }
   },
 
@@ -76,9 +72,14 @@ const CategoryController = {
 
       const { id } = req.params;
 
-      const category = await Category.findById(id).populate("subjects", {
-        name: 1,
-        url: 1,
+      const category = await Category.findById(id).populate({
+        path: "subjects",
+        select: "name url",
+        populate: {
+          path: "courses",
+          select: "name url",
+          model: "Course",
+        },
       });
 
       const { name, url, imgUrl, description, subjects } = category;
@@ -97,13 +98,7 @@ const CategoryController = {
         })
         .end();
     } catch (error) {
-      const name = error?.details
-        ? error.details[0].type.split(".")[1]
-        : error.name;
-      const message = error?.details ? error.details[0].message : error.message;
-
-      error = { name, message };
-      next(error);
+      next(parseError(error));
     }
   },
 
@@ -117,13 +112,10 @@ const CategoryController = {
         $or: [{ _id }, { name: req.body?.name }],
       });
 
-      console.log({ categories });
-
-      if (categories.length === 0 || categories.length != 1)
+      if (categories.length === 0 || categories.length > 1)
         throw { name: "updateError", message: "Cannot update categories" };
 
       const category = await Category.findById(_id);
-      console.log({ category });
 
       const updatedCategory = {
         name: req.body.name || category.name,
@@ -141,13 +133,7 @@ const CategoryController = {
         })
         .end();
     } catch (error) {
-      const name = error?.details
-        ? error.details[0].type.split(".")[1]
-        : error.name;
-      const message = error?.details ? error.details[0].message : error.message;
-      error = { name, message };
-
-      next(error);
+      next(parseError(error));
     }
   },
   deleteOne: async (req, res, next) => {
@@ -155,23 +141,13 @@ const CategoryController = {
       await validateDelete(req.params);
       const { id } = req.params;
 
-      const category = await Category.findById(id);
-
-      if (!category) throw { name: "deleteError", message: "Cannot delete" };
-
       await Category.findOneAndDelete(id);
 
       return res
         .status(200)
         .json({ error: false, message: "Category deleted" });
     } catch (error) {
-      const name = error?.details
-        ? error.details[0].type.split(".")[1]
-        : error.name;
-      const message = error?.details ? error.details[0].message : error.message;
-      error = { name, message };
-
-      next(error);
+      next(parseError(error));
     }
   },
   deleteAll: async (req, res, next) => {
