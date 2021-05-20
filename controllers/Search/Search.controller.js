@@ -3,24 +3,32 @@ const Subject = require("../../models/Subject.model");
 const { validateSearch } = require("./Search.validator");
 const parseError = require("../../utils/parseError");
 
-module.exports = async (req, res, next) => {
-  try {
-    await validateSearch(req.query);
-    const { search = "" } = req.query;
+const SearchController = {
+  searchByRegex: async (req, res, next) => {
+    try {
+      await validateSearch(req.query);
+      const { pattern = "" } = req.query;
 
-    const regexExpression = new RegExp(`${search}`);
+      const regexExpression = new RegExp(`^${pattern}`, "i");
 
-    const categories = await Category.find({ name: regexExpression });
-    const subjects = await Subject.find({ name: regexExpression });
+      //TODO: get users
+      // const users = await User.find({ username: regexExpression })
+      const subjects = await Subject.find({ name: regexExpression });
 
-    console.log({ categories });
+      const mappedSubjects = subjects.map(({ _id: id, name, courses }) => ({
+        id,
+        name,
+        courseCount: courses.length,
+      }));
 
-    return res.status(200).json({
-      error: false,
-      categories,
-      subjects,
-    });
-  } catch (error) {
-    next(parseError(error));
-  }
+      return res.status(200).json({
+        error: false,
+        subjects: mappedSubjects,
+      });
+    } catch (error) {
+      next(parseError(error));
+    }
+  },
 };
+
+module.exports = SearchController;

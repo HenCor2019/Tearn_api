@@ -3,7 +3,7 @@ const joi = require("joi");
 const validator = {
   validateSearch: (data) => {
     const validate = joi.object({
-      search: joi.string().required(),
+      pattern: joi.string().required(),
     });
 
     return validate.validateAsync(data);
