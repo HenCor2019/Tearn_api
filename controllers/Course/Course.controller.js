@@ -72,7 +72,10 @@ const CourseController = {
     try {
       await validateParams(req.params);
       const { id } = req.params;
-      const { name, url, subjectId, tutors } = await Course.findById(id);
+      const course = await Course.findById(id);
+
+      if (!course) throw { name: "notFoundError", message: "Course not found" };
+      const { name, url, subjectId, tutors } = course;
 
       return res
         .status(200)
