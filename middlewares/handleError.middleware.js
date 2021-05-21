@@ -11,6 +11,9 @@ const ERROR_HANDLERS = {
   base: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 
+  notFoundError: (res, { message }) =>
+    res.status(404).json({ error: true, message }).end(),
+
   existError: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 

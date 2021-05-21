@@ -6,7 +6,12 @@ const parseError = require("../../utils/parseError");
 const SearchController = {
   searchByRegex: async (req, res, next) => {
     try {
-      await validateSearch(req.query);
+
+      /*
+       * NOTE: validateSearch method don´t allow empty fields
+       * await validateSearch(req.query);
+       */
+
       const { pattern = "" } = req.query;
 
       const regexExpression = new RegExp(`^${pattern}`, "i");

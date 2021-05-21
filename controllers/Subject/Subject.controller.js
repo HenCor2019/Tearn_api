@@ -81,9 +81,12 @@ const SubjectController = {
       await validateOneSubject(req.params);
       const { id } = req.params;
 
-      const { name, categoryId, courses, url } = await Subject.findById(
-        id
-      ).populate("courses");
+      const subject = await Subject.findById(id).populate("courses");
+
+      if (!subject)
+        throw { name: "notFoundError", message: "Subject not found" };
+
+      const { name, categoryId, courses, url } = subject;
 
       return res.status(200).json({
         error: false,
