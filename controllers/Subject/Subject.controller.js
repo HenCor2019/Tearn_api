@@ -1,6 +1,5 @@
 const Category = require("../../models/Category.model");
 const Subject = require("../../models/Subject.model");
-const parseError = require("../../utils/parseError");
 
 const {
   validateSubjectBody,
@@ -46,7 +45,7 @@ const SubjectController = {
         })
         .end();
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
@@ -98,7 +97,7 @@ const SubjectController = {
         courses,
       });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
@@ -132,7 +131,7 @@ const SubjectController = {
         })
         .end();
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
