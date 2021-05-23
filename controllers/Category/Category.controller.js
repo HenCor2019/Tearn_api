@@ -82,6 +82,9 @@ const CategoryController = {
         },
       });
 
+      if (!category)
+        throw { name: "notFoundError", message: "Category not found" };
+
       const { name, url, imgUrl, description, subjects } = category;
 
       return res

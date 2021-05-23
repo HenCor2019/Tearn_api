@@ -9,6 +9,7 @@ var categoryRouter = require("./routes/Category/Category.router");
 var subjectRouter = require("./routes/Subject/Subject.router");
 var commentaryRouter = require("./routes/Commentary/Commentary.router")
 var courseRouter = require("./routes/Course/Course.router");
+var searchRouter = require("./routes/Search/Search.router");
 const notFound = require("./middlewares/NotFound.middleware");
 const handleErrors = require("./middlewares/handleError.middleware");
 
@@ -26,6 +27,7 @@ app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/subject", subjectRouter);
 app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/commentary", commentaryRouter);
+app.use("/api/v1/search", searchRouter);
 
 app.use(notFound);
 app.use(handleErrors);
