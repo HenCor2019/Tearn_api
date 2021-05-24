@@ -1,10 +1,10 @@
 const { Schema, model } = require("mongoose");
 
 var ReportModel = Schema({
-    userId: { type: Schema.ObjectId, ref: "User" },
-    createdDateTime: { type: Date, required: true },
+    userId: { type: String, required: true },
+    createdDateTime: { type: String, required: true },
     description: { type: String, required: true },
-    tutorReportedId: { type: Schema.ObjectId, ref: "User" },
+    tutorReportedId: { type: String, required: true },
 });
 
 module.exports = model("Report", ReportModel);

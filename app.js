@@ -12,6 +12,7 @@ var commentaryRouter = require("./routes/Commentary/Commentary.router");
 var courseRouter = require("./routes/Course/Course.router");
 var homeRouter = require("./routes/Home/Home.router");
 var searchRouter = require("./routes/Search/Search.router");
+var reportRouter = require("./routes/Report/Report.router")
 const notFound = require("./middlewares/NotFound.middleware");
 const handleErrors = require("./middlewares/handleError.middleware");
 
@@ -29,6 +30,7 @@ app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/subject", subjectRouter);
 app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/home", homeRouter);
+app.use("/api/v1/report", reportRouter);
 app.use("/api/v1/commentary", commentaryRouter);
 app.use("/api/v1/search", searchRouter);
 app.use("/api/v1/user", usersRouter);
