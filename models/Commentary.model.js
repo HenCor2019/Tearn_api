@@ -1,9 +1,9 @@
 const { Schema, model } = require("mongoose");
 
 var CommentaryModel = Schema({
-    author: { type: Schema.ObjectId, ref: "User" },
+    author: { type: String, required: true },
     description: { type: String, required: true },
-    adressedId: { type: Schema.ObjectId, ref: "User" },
+    adressedId: { type: String, requiered: true },
     puntuation: { type: Number, required: true },
 });
 
