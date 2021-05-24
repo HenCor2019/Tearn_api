@@ -1,13 +1,16 @@
 const randomCategories = require("./randomCategories");
 
-module.exports = (categoriesId) => {
-  const filteredCategories = randomCategories(categoriesId);
-
-  return filteredCategories.reduce(
+const mapToRegex = (arr) =>
+  arr.reduce(
     (acc, currentId, index) =>
-      index != categoriesId.length - 1
-        ? `${acc}${currentId}|`
-        : `${acc}${currentId}`,
+      index != arr.length - 1 ? `${acc}${currentId}|` : `${acc}${currentId}`,
     ""
   );
+
+const mapCategories = (categoriesId) => {
+  const filteredCategories = randomCategories(categoriesId);
+
+  return mapToRegex(filteredCategories);
 };
+
+module.exports = { mapCategories, mapToRegex };

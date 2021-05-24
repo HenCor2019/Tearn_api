@@ -20,7 +20,13 @@ const ERROR_HANDLERS = {
   updateError: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 
+  InvalidTutorError: (res, { message }) =>
+    res.status(400).json({ error: true, message }).end(),
+
   deleteError: (res, { message }) =>
+    res.status(400).json({ error: true, message }).end(),
+
+  ValidationError: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 
   defaultError: (res, error) => {
@@ -34,7 +40,6 @@ const ERROR_HANDLERS = {
 
 module.exports = (error, request, response, next) => {
   const handler = ERROR_HANDLERS[error.name] || ERROR_HANDLERS.defaultError;
-  console.log({ error });
 
   handler(response, error);
 };

@@ -6,7 +6,6 @@ const {
   validateUpdate,
   validateDelete,
 } = require("./Course.validator");
-const parseError = require("../../utils/parseError");
 
 const CourseController = {
   createCourse: async (req, res, next) => {
@@ -40,12 +39,12 @@ const CourseController = {
         message: "Course created sucessfuly",
       });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
   allCourses: async (req, res, next) => {
     try {
-      const courses = await Course.find();
+      const courses = await Course.find().populate("tutors");
       const mappedCourses = courses.map(
         ({ _id: id, name, url, subjectId, tutors }) => ({
           id,
@@ -72,9 +71,14 @@ const CourseController = {
     try {
       await validateParams(req.params);
       const { id } = req.params;
-      const course = await Course.findById(id);
+      const course = await Course.findById(id).populate("tutors", {
+        fullName: 1,
+        imgUrl: 1,
+        url: 1,
+      });
 
       if (!course) throw { name: "notFoundError", message: "Course not found" };
+
       const { name, url, subjectId, tutors } = course;
 
       return res
@@ -92,6 +96,7 @@ const CourseController = {
       next(error);
     }
   },
+
   updateCourse: async (req, res, next) => {
     try {
       await validateUpdate(req.body);
@@ -119,7 +124,7 @@ const CourseController = {
         message: "Course was update sucessfuly",
       });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
   deleteOneCourse: async (req, res, next) => {
@@ -135,7 +140,7 @@ const CourseController = {
         message: "Course was deleted sucessfuly",
       });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
@@ -148,7 +153,7 @@ const CourseController = {
         message: "Courses was deleted",
       });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 };

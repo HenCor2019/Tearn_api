@@ -1,5 +1,4 @@
 const Category = require("../../models/Category.model");
-const parseError = require("../../utils/parseError");
 const {
   validateCreation,
   validateOneCategory,
@@ -39,7 +38,7 @@ const CategoryController = {
         .json({ error: false, message: "Category was created" })
         .end();
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
@@ -101,7 +100,7 @@ const CategoryController = {
         })
         .end();
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
 
@@ -136,7 +135,7 @@ const CategoryController = {
         })
         .end();
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
   deleteOne: async (req, res, next) => {
@@ -150,7 +149,7 @@ const CategoryController = {
         .status(200)
         .json({ error: false, message: "Category deleted" });
     } catch (error) {
-      next(parseError(error));
+      next(error);
     }
   },
   deleteAll: async (req, res, next) => {
