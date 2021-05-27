@@ -1,104 +1,168 @@
-const Comentary = require("../../models/Commentary.model");
-const parseError = require("../../utils/parseError");
-const { validateCreateComment, validateGetComment, validateDeleteCommentary } = require("./Commentary.validator");
-
+const Commentary = require('../../models/Commentary.model')
+const User = require('../../models/User.model')
+const {
+  validateCreateComment,
+  validateId,
+  validateUpdateCommentary
+} = require('./Commentary.validator')
 
 const CommentaryControler = {
-    createComentary: async(req, res, next) => {
-        try {
-            await validateCreateComment(req.body)
-            const { description, puntuation, author, adressedId } = req.body
-            console.log({ puntuation })
-            const newCommentary = await new Comentary({
-                description,
-                puntuation,
-                author,
-                adressedId
-            })
-            await newCommentary.save()
-            return res.status(201).json({
-                error: false,
-                message: "the commentary was created"
+  createComentary: async (req, res, next) => {
+    try {
+      await validateCreateComment(req.body)
+      const { description, puntuation, author, adressedId } = req.body
 
-            })
-        } catch (error) {
-            next(parseError(error))
+      if (author === adressedId) {
+        throw {
+          name: 'SameUserError',
+          message: "You can't commented yourself"
         }
+      }
 
-    },
-    getAll: async(req, res, next) => {
-        try {
-            const commentaries = await Comentary.find()
-            return res.status(200).json({
-                error: false,
-                commentaries
-            })
-        } catch (error) {
-            next(error)
+      const userAuthor = await User.findById(author)
+      const tutor = await User.findById(adressedId)
+
+      if (!userAuthor || !tutor || !tutor.isTutor) {
+        throw {
+          name: 'InvalidTutorError',
+          message: 'Cannot find the author or tutor'
         }
-    },
-    getCommentary: async(req, res, next) => {
-        try {
-            await validateGetComment(req.params)
-            const commentary = await Comentary.findById(req.params.id)
-                //const commentary = await Comentary.findOne({_id: req.params.id}) the same thing
-            return res.status(200).json({
-                error: false,
-                commentary
-            })
-        } catch (error) {
-            next(parseError(error))
+      }
+      const commentary = await Commentary.findOne({ author })
+
+      if (commentary) {
+        throw {
+          name: 'ExistError',
+          message: 'Commentary already exist'
         }
-    },
-    updateCommentary: async(req, res, next) => {
-        try {
-            await validateUpdateComment(req.body);
+      }
 
-            const { id } = req.body;
+      const newCommentary = new Commentary({
+        description,
+        puntuation,
+        author,
+        adressedId
+      })
 
-            const commentaries = await Comentary.find({
-                $or: [{ id }, { name: req.body.name }],
-            });
+      userAuthor.commentaries = userAuthor.commentaries.concat(newCommentary)
+      tutor.commentaries = tutor.commentaries.concat(newCommentary)
 
-            if (commentaries.length || commentaries.length > 1)
-                throw { name: "updateError", message: "Cannot update commentary" };
+      await userAuthor.save()
+      await tutor.save()
 
-            const commentary = await Commentary.findById(id);
+      await newCommentary.save()
 
-            const updatedCommentary = {
-                description: req.body.name || commentary.name,
-                puntuation: req.body.name || commentary.name,
-            };
-
-            await Subject.findOneAndUpdate({ _id: commentary._id }, updatedCommentary);
-
-            return res
-                .status(200)
-                .json({
-                    error: false,
-                    message: "Commentary was updated",
-                })
-                .end();
-        } catch (error) {
-            next(error);
+      return res
+        .status(201)
+        .json({
+          error: false,
+          message: 'the commentary was created'
+        })
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  },
+  getAll: async (req, res, next) => {
+    try {
+      const commentaries = await Commentary.find()
+      return res.status(200).json({
+        error: false,
+        commentaries
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+  getCommentary: async (req, res, next) => {
+    try {
+      await validateId(req.params)
+      const commentary = await Commentary.findById(req.params.id)
+      return res.status(200).json({
+        error: false,
+        commentary
+      })
+    } catch (error) {
+      next(parseError(error))
+    }
+  },
+  getTutorCommentaries: async (req, res, next) => {
+    try {
+      await validateId(req.params)
+      const { id: adressedId } = req.params
+      const commentaries = await Commentary.find({ adressedId }).populate(
+        'author',
+        {
+          username: 1,
+          imgUrl: 1,
+          _id: 0
         }
-    },
-    deleteCommentary: async(req, res, next) => {
-        try {
-            await validateDeleteCommentary(req.params);
-            const { id } = req.params;
+      )
+      return res.status(200).json({
+        error: false,
+        count: commentaries.length,
+        results: commentaries.map(({ author, puntuation, description }) => ({
+          author,
+          description,
+          puntuation
+        }))
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+  updateCommentary: async (req, res, next) => {
+    try {
+      await validateUpdateCommentary(req.body)
 
-            await Comentary.findOneAndDelete(id);
+      const { id } = req.body
 
-            return res.status(200).json({
-                error: false,
-                message: "Commentary was delete",
-            });
-        } catch (error) {
-            next(error);
+      const commentary = await Commentary.findById(id)
+
+      if (!commentary) {
+        throw {
+          name: 'updateError',
+          message: 'Cannot update commentary'
         }
-    },
+      }
 
+      const updatedCommentary = {
+        description: req.body.description || commentary.description,
+        puntuation: req.body.puntuation ?? commentary.puntuation
+      }
+
+      await Commentary.findOneAndUpdate(
+        { _id: commentary._id },
+        updatedCommentary
+      )
+
+      return res
+        .status(200)
+        .json({
+          error: false,
+          message: 'Commentary was updated'
+        })
+        .end()
+    } catch (error) {
+      console.log({ error })
+      next(error)
+    }
+  },
+  deleteCommentary: async (req, res, next) => {
+    try {
+      await validateId(req.params)
+      const { id } = req.params
+
+      await Commentary.findOneAndDelete(id)
+
+      return res.status(200).json({
+        error: false,
+        message: 'Commentary was delete'
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = CommentaryControler

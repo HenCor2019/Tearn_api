@@ -1,10 +1,10 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose')
 
-var SubjectSchema = Schema({
+const SubjectSchema = Schema({
   name: { type: String, required: true },
   url: { type: String, required: true },
   categoryId: { type: String, required: true },
-  courses: [{ type: Schema.ObjectId, ref: "Course" }],
-});
+  courses: [{ type: Schema.ObjectId, ref: 'Course' }]
+})
 
-module.exports = model("Subject", SubjectSchema);
+module.exports = model('Subject', SubjectSchema)

@@ -1,41 +1,41 @@
-const joi = require("joi");
+const joi = require('joi')
 
 const validator = (module.exports = {
   validateCreation: (data) => {
     const validateCategory = joi.object({
-      name: joi.string().max(25).required(),
+      name: joi.string().max(40).required(),
       description: joi.string().max(100).required(),
       imgUrl: joi.string(),
-      subjects: joi.string(),
-    });
+      subjects: joi.string()
+    })
 
-    return validateCategory.validateAsync(data);
+    return validateCategory.validateAsync(data)
   },
   validateOneCategory: (data) => {
     const validate = joi.object({
-      id: joi.string().required(),
-    });
+      id: joi.string().required()
+    })
 
-    return validate.validateAsync(data);
+    return validate.validateAsync(data)
   },
   validateUpdate: (data) => {
     const validate = joi.object({
       _id: joi.string().required(),
-      name: joi.string().max(25),
+      name: joi.string().max(40),
       description: joi.string().max(100),
-      imgUrl: joi.string(),
-    });
+      imgUrl: joi.string()
+    })
 
-    return validate.validateAsync(data);
+    return validate.validateAsync(data)
   },
 
   validateDelete: (data) => {
     const validate = joi.object({
-      id: joi.string().required(),
-    });
+      id: joi.string().required()
+    })
 
-    return validate.validateAsync(data);
-  },
-});
+    return validate.validateAsync(data)
+  }
+})
 
-module.exports = validator;
+module.exports = validator

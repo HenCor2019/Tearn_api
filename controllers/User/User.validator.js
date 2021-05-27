@@ -1,23 +1,23 @@
-const joi = require("joi");
+const joi = require('joi')
 
 const UserValidator = {
   validateLoginFacebook: (data) => {
     const validate = joi.object({
       username: joi.string().required(),
       email: joi.string().email().required(),
-      imgUrl: joi.string().required(),
-    });
+      imgUrl: joi.string().required()
+    })
 
-    return validate.validateAsync(data);
+    return validate.validateAsync(data)
   },
 
   validateUpdateToTutor: (data) => {
     const validate = joi.object({
       id: joi.string().required(),
-      courseId: joi.string(),
-      favTutors: joi.string(),
-      preference: joi.string(),
-      subjectId: joi.string(),
+      coursesId: joi.array().items(joi.string()).required(),
+      subjectsId: joi.array().items(joi.string()).required(),
+      favTutor: joi.string(),
+      preferences: joi.array().items(joi.string()),
       fullName: joi.string().required(),
       dot: joi.string().required(),
       languages: joi.array().items(joi.string()),
@@ -25,10 +25,10 @@ const UserValidator = {
       responseTime: joi.string().required(),
       puntuation: joi.number(),
       commentary: joi.string(),
-      reports: joi.string(),
-    });
+      reports: joi.string()
+    })
 
-    return validate.validateAsync(data);
+    return validate.validateAsync(data)
   },
 
   validateUpdateNormalUser: (data) => {
@@ -36,19 +36,19 @@ const UserValidator = {
       id: joi.string().required(),
       username: joi.string(),
       imgUrl: joi.string(),
-      preference: joi.string(),
-      favTutor: joi.string(),
-    });
-    return validate.validateAsync(data);
+      preferences: joi.array().items(joi.string()),
+      favTutor: joi.string()
+    })
+    return validate.validateAsync(data)
   },
 
   validateId: (data) => {
     const validate = joi.object({
-      id: joi.string().required(),
-    });
+      id: joi.string().required()
+    })
 
-    return validate.validateAsync(data);
-  },
-};
+    return validate.validateAsync(data)
+  }
+}
 
-module.exports = UserValidator;
+module.exports = UserValidator

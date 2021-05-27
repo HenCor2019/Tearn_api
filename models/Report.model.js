@@ -1,10 +1,10 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose')
 
-var ReportModel = Schema({
-    userId: { type: String, required: true },
-    createdDateTime: { type: String, required: true },
-    description: { type: String, required: true },
-    tutorReportedId: { type: String, required: true },
-});
+const ReportModel = Schema({
+  userId: { type: Schema.ObjectId, ref: 'User', required: true },
+  createdDateTime: { type: String, required: true },
+  description: { type: String, required: true },
+  tutorReportedId: { type: Schema.ObjectId, ref: 'User', required: true }
+})
 
-module.exports = model("Report", ReportModel);
+module.exports = model('Report', ReportModel)

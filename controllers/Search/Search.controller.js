@@ -1,5 +1,5 @@
-const Subject = require("../../models/Subject.model");
-const User = require("../../models/User.model");
+const Subject = require('../../models/Subject.model')
+const User = require('../../models/User.model')
 
 const SearchController = {
   searchByRegex: async (req, res, next) => {
@@ -9,24 +9,24 @@ const SearchController = {
        * await validateSearch(req.query);
        */
 
-      const { pattern = "" } = req.query;
+      const { pattern = '' } = req.query
 
-      const regexExpression = new RegExp(`^${pattern}`, "i");
+      const regexExpression = new RegExp(`^${pattern}`, 'i')
 
-      //TODO: get users
+      // TODO: get users
       const tutors = await User.find({
-        $and: [{ username: regexExpression }, { isTutor: true }],
-      }).populate("subjectsId", { name: 1 });
-      const subjects = await Subject.find({ name: regexExpression });
+        $and: [{ username: regexExpression }, { isTutor: true }]
+      }).populate('subjectsId', { name: 1 })
+      const subjects = await Subject.find({ name: regexExpression })
 
       const mappedSubjects = subjects.map(
         ({ _id: id, name, url, courses }) => ({
           id,
           name,
           url,
-          courseCount: courses.length,
+          courseCount: courses.length
         })
-      );
+      )
 
       const mappedTutors = tutors.map(
         ({ _id: id, username, imgUrl, url, subjectsId, puntuation = 0 }) => ({
@@ -35,19 +35,19 @@ const SearchController = {
           imgUrl,
           url,
           subjects: subjectsId.map(({ name }) => name),
-          puntuation,
+          puntuation
         })
-      );
+      )
 
       return res.status(200).json({
         error: false,
         subjects: mappedSubjects,
-        tutors: mappedTutors,
-      });
+        tutors: mappedTutors
+      })
     } catch (error) {
-      next(error);
+      next(error)
     }
-  },
-};
+  }
+}
 
-module.exports = SearchController;
+module.exports = SearchController

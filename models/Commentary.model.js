@@ -1,10 +1,10 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose')
 
-var CommentaryModel = Schema({
-    author: { type: String, required: true },
-    description: { type: String, required: true },
-    adressedId: { type: String, requiered: true },
-    puntuation: { type: Number, required: true },
-});
+const CommentaryModel = Schema({
+  author: { type: Schema.ObjectId, ref: 'User', required: true },
+  description: { type: String, required: true },
+  adressedId: { type: Schema.ObjectId, ref: 'User', requiered: true },
+  puntuation: { type: Number, required: true }
+})
 
-module.exports = model("Commentary", CommentaryModel);
+module.exports = model('Commentary', CommentaryModel)

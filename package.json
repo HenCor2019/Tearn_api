@@ -5,11 +5,14 @@
   "scripts": {
     "start": "node ./bin/www",
     "eslint": "eslint .",
+    "standard": "standard *",
+    "standard:fix": "standard --fix",
     "eslint:init": "eslint --init",
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^9.0.2",
     "express": "~4.16.1",
@@ -19,7 +22,10 @@
     "morgan": "~1.9.1"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "standard": "^16.0.3"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/standard/eslintrc.json"
   }
 }
