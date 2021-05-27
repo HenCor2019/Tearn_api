@@ -10,6 +10,7 @@ const HomeController = {
 
       if (req.params?.id) {
         const user = await User.findById(req.params?.id)
+        console.log({ user })
         preferences =
           user?.preferences.length == 0
             ? await randomPreferences()

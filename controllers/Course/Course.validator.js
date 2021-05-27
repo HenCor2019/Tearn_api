@@ -4,7 +4,8 @@ const validator = {
   validateCreation: (data) => {
     const validate = joi.object({
       name: joi.string().required(),
-      subjectId: joi.string().required()
+      subjectId: joi.string().required(),
+      imgUrl: joi.string().required()
     })
 
     return validate.validateAsync(data)
