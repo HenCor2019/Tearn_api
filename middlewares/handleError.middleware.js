@@ -26,7 +26,7 @@ const ERROR_HANDLERS = {
     console.error(error.name)
     return res
       .status(500)
-      .json({ error: true, message: 'Something was wrong' })
+      .json({ error: true, message: 'Something was wrong', errorMessage: error })
       .end()
   }
 }
