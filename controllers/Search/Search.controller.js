@@ -11,14 +11,17 @@ const SearchController = {
        */
 
       const { pattern = '' } = req.query
+      console.log({ pattern })
 
       const regexExpression = new RegExp(`^${mapSearch(pattern)}`, 'i')
+      console.log({ regexExpression })
 
       const tutors = await User.find({
         $and: [{ username: regexExpression }, { isTutor: true }],
       }).populate('subjectsId', { name: 1 })
 
       const courses = await Course.find({ name: regexExpression })
+      console.log({ courses })
 
       const mappedCourses = courses.map(({ _id: id, name, url, tutors }) => ({
         id,
