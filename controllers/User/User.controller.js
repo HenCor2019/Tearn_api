@@ -114,7 +114,7 @@ const UserController = {
 
       const user = await User.findById(id)
 
-      if (!user) throw { name: 'notFoundError', message: 'User not found' }
+      if (!user) throw { name: 'NotFoundError', message: 'User not found' }
 
       const courses = await Course.find({ _id: { $in: coursesId } })
       const subjects = await Subject.find({ _id: { $in: subjectsId } })
@@ -133,7 +133,7 @@ const UserController = {
         fullName: req.body.fullName || user.fullName,
         dot: req.body.dot || user.dot,
         url: `${process.env.BASE_URL}user/tutor/${user._id}`,
-        urlCommentaries: `${process.env.BASE_URL}user/tutors/${user._id}`,
+        urlCommentaries: `${process.env.BASE_URL}commentary/tutors/${user._id}`,
         languages: insertUniqueIds(user.languages, req.body?.languages),
         subjectsId: insertUniqueIds(user.subjectsId, req.body?.subjectsId),
         coursesId: insertUniqueIds(user.coursesId, req.body?.coursesId),
