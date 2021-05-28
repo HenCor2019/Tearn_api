@@ -10,12 +10,14 @@ const regexExpression = {
   mapSearch: (pattern) => {
     const newPattern = pattern
       .trim()
+      .toLowerCase()
       .split('')
       .map((letter) =>
-        letter.replaceAll(regexReplace, LETTERS[letter.toLowerCase()])
+        // letter.replaceAll(regexReplace, LETTERS[letter.toLowerCase()])
+        letter.match(regexReplace) ? LETTERS[letter] : letter
       )
 
-    return 'c(a|á)'
+    return newPattern.toString()
   },
 }
 
