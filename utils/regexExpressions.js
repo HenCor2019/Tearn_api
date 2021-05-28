@@ -17,7 +17,7 @@ const regexExpression = {
         letter.match(regexReplace) ? LETTERS[letter] : letter
       )
 
-    return newPattern.toString()
+    return newPattern.join('').toString()
   },
 }
 
