@@ -9,11 +9,10 @@ const SearchController = {
        * NOTE: validateSearch method don´t allow empty fields
        * await validateSearch(req.query);
        */
-
       const { pattern = '' } = req.query
       console.log({ pattern })
 
-      const regexExpression = new RegExp(`^${mapSearch(pattern)}`, 'i')
+      const regexExpression = new RegExp(`^c(a|á)`, 'i')
       console.log({ regexExpression })
 
       const tutors = await User.find({
