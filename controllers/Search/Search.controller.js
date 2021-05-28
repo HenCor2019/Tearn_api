@@ -5,6 +5,7 @@ const { mapSearch } = require('../../utils/regexExpressions')
 const SearchController = {
   searchByRegex: async (req, res, next) => {
     try {
+
       /*
        * NOTE: validateSearch method don´t allow empty fields
        * await validateSearch(req.query);
@@ -12,7 +13,8 @@ const SearchController = {
 
       const { pattern = '' } = req.query
 
-      const regexExpression = new RegExp(`^${mapSearch(pattern)}`, 'i')
+      //     const regexExpression = new RegExp(`^${mapSearch(pattern)}`, 'i')
+      const regexExpression = new RegExp(`^ca`, 'i')
 
       const tutors = await User.find({
         $and: [{ username: regexExpression }, { isTutor: true }],
