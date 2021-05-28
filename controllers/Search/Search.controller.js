@@ -5,7 +5,6 @@ const { mapSearch } = require('../../utils/regexExpressions')
 const SearchController = {
   searchByRegex: async (req, res, next) => {
     try {
-
       /*
        * NOTE: validateSearch method don´t allow empty fields
        * await validateSearch(req.query);
