@@ -13,7 +13,6 @@ const regexExpression = {
       .toLowerCase()
       .split('')
       .map((letter) =>
-        // letter.replaceAll(regexReplace, LETTERS[letter.toLowerCase()])
         letter.match(regexReplace) ? LETTERS[letter] : letter
       )
 
