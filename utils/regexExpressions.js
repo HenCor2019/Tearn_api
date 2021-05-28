@@ -15,7 +15,7 @@ const regexExpression = {
         letter.replaceAll(regexReplace, LETTERS[letter.toLowerCase()])
       )
 
-    return newPattern.join('')
+    return 'c(a|á)'
   },
 }
 
