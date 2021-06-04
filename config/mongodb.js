@@ -1,8 +1,11 @@
 const mongoose = require('mongoose')
+const { MONGO_URI_TEST, NODE_ENV, MONGO_URI } = process.env
+
+const connectionString = NODE_ENV === 'test' ? MONGO_URI_TEST : MONGO_URI
 
 const connect = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(connectionString, {
       useCreateIndex: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,

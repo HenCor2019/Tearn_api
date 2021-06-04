@@ -1,6 +1,6 @@
 const express = require('express')
 const {
-  loginFacebook,
+  loginGoogle,
   allUser,
   updateToTutor,
   updateNormalUser,
@@ -13,7 +13,7 @@ const {
 } = require('../../controllers/User/User.controller')
 const router = express.Router()
 
-router.post('/login', loginFacebook)
+router.post('/login', loginGoogle)
 
 router.get('/', allUser)
 router.get('/:id', oneUser)
@@ -22,7 +22,7 @@ router.get('/tutor/:id', oneTutor)
 router.get('/tutors/:id', tutorsUser)
 
 router.put('/update-tutor/', updateToTutor)
-router.put('/update', updateNormalUser)
+router.put('/', updateNormalUser)
 
 router.delete('/:id', deleteUser)
 router.delete('/', deleteAll)

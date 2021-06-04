@@ -1,8 +1,9 @@
+require('dotenv').config()
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
-const database = require('./mongodb/mongodb')
+const database = require('./config/mongodb')
 const cors = require('cors')
 
 const indexRouter = require('./routes/index')

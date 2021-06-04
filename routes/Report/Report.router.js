@@ -5,7 +5,7 @@ const {
 } = require('../../controllers/Report/Report.controller')
 const router = express.Router()
 
-router.post('/create', createReport)
+router.post('/', createReport)
 router.get('/', getAllReports)
 
 module.exports = router

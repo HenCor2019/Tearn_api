@@ -16,11 +16,11 @@ const SubjectController = {
 
       const subject = await Subject.findOne({ name })
 
-      if (subject) { throw { name: 'ExistError', message: 'Subject already exist' } }
+      if (subject) {
+        throw { name: 'ExistError', message: 'Subject already exist' }
+      }
 
       const category = await Category.findById(categoryId)
-
-      if (!category) { throw { name: 'NotFoundError', message: 'Category not found' } }
 
       const newSubject = new Subject({
         name,
@@ -31,9 +31,11 @@ const SubjectController = {
 
       newSubject.url += `subject/${newSubject._id}`
 
-      category.subjects = category.subjects.concat(newSubject)
+      if (category) {
+        category.subjects = category.subjects.concat(newSubject)
 
-      await category.save()
+        await category.save()
+      }
       await newSubject.save()
 
       return res
@@ -52,7 +54,7 @@ const SubjectController = {
         select: 'name subjectId url'
       })
 
-      mappedSubjects = subjects.map(
+      const mappedSubjects = subjects.map(
         ({ _id: id, name, url, categoryId, courses }) => ({
           id,
           name,
@@ -81,7 +83,9 @@ const SubjectController = {
 
       const subject = await Subject.findById(id).populate('courses')
 
-      if (!subject) { throw { name: 'NotFoundError', message: 'Subject not found' } }
+      if (!subject) {
+        throw { name: 'NotFoundError', message: 'Subject not found' }
+      }
 
       const { name, categoryId, courses, url } = subject
 
@@ -112,7 +116,9 @@ const SubjectController = {
         $or: [{ _id: id }, { name: req.body?.name }]
       })
 
-      if (subjects.length || subjects.length > 1) { throw { name: 'UpdateError', message: 'Cannot update subject' } }
+      if (subjects.length === 0 || subjects.length > 1) {
+        throw { name: 'UpdateError', message: 'Cannot update subject' }
+      }
 
       const subject = await Subject.findById(id)
 

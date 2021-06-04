@@ -18,8 +18,8 @@ const CategoryController = {
 
       const category = await Category.find({ name })
 
-      if (category.length != 0) {
-        throw { name: 'ExistError', message: 'category already exist' }
+      if (category.length !== 0) {
+        throw { name: 'ExistError', message: 'Category already exist' }
       }
 
       const newCategory = new Category({
@@ -39,6 +39,7 @@ const CategoryController = {
         .json({ error: false, message: 'Category was created' })
         .end()
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   },
@@ -109,7 +110,7 @@ const CategoryController = {
     try {
       await validateUpdate(req.body)
 
-      const { _id } = req.body
+      const { id: _id } = req.body
 
       const categories = await Category.find({
         $or: [{ _id }, { name: req.body?.name }]

@@ -7,16 +7,16 @@ const {
   validateLoginFacebook,
   validateUpdateToTutor,
   validateUpdateNormalUser,
-  validateId,
+  validateId
 } = require('./User.validator')
 const {
   insertUniqueId,
   insertUniqueIds,
-  addOrRemoveFavoriteTutors,
+  addOrRemoveFavoriteTutors
 } = require('../../utils/user.utils')
 
 const UserController = {
-  loginFacebook: async (req, res, next) => {
+  loginGoogle: async (req, res, next) => {
     try {
       await validateLoginFacebook(req.body)
 
@@ -26,14 +26,14 @@ const UserController = {
 
       if (user.length > 1) next()
 
-      if (user.length == 0) {
+      if (user.length === 0) {
         const newUser = new User({
           username,
           email,
           imgUrl,
           isTutor: false,
           favTutors: [],
-          preferences: [],
+          preferences: []
         })
         newUser.urlTutors = `${process.env.BASE_URL}user/tutors/${newUser._id}`
 
@@ -41,7 +41,7 @@ const UserController = {
           _id: id,
           username: newUsername,
           email: newEmail,
-          imgUrl: newImgUrl,
+          imgUrl: newImgUrl
         } = await newUser.save()
 
         const token = jwt.sign(
@@ -57,14 +57,14 @@ const UserController = {
         _id: id,
         username: registerUsername,
         email: regiserEmail,
-        imgUrl: registerImgUrl,
+        imgUrl: registerImgUrl
       } = user
 
       const token = jwt.sign(
         { id, registerUsername, regiserEmail, registerImgUrl },
         process.env.TOKEN_KEY,
         {
-          expiresIn: '14d',
+          expiresIn: '14d'
         }
       )
 
@@ -88,7 +88,7 @@ const UserController = {
           preferences,
           favTutors,
           description,
-          isTutor,
+          isTutor
         }) => ({
           id,
           username,
@@ -97,7 +97,7 @@ const UserController = {
           preferences,
           favTutors,
           description,
-          isTutor,
+          isTutor
         })
       )
 
@@ -122,7 +122,7 @@ const UserController = {
       if (!subjects.length || !courses.length) {
         throw {
           name: 'InvalidId',
-          message: 'Cannot find the subject or course',
+          message: 'Cannot find the subject or course'
         }
       }
 
@@ -141,7 +141,7 @@ const UserController = {
         responseTime: req.body.responseTime || user.responseTime,
         puntuation: req.body.puntuation || user.puntuation || 0,
         commentaries: insertUniqueId(user.commentaries, req.body?.commentary),
-        reports: insertUniqueId(user.reports, req.body.reports),
+        reports: insertUniqueId(user.reports, req.body.reports)
       }
 
       await User.findOneAndUpdate({ _id: id }, preUpdateUser)
@@ -181,17 +181,14 @@ const UserController = {
         username: req.body.username || user.username,
         imgUrl: req.body.imgUrl || user.imgUrl,
         preferences: insertUniqueIds(user?.preferences, req.body?.preferences),
-        favTutors: addOrRemoveFavoriteTutors(
-          user.favTutors,
-          req.body?.favTutor
-        ),
+        favTutors: addOrRemoveFavoriteTutors(user.favTutors, req.body?.favTutor)
       }
 
       await User.findOneAndUpdate({ _id: id }, preUpdateUser)
 
       return res.status(200).json({
         error: false,
-        message: 'User was updated sucessfuly',
+        message: 'User was updated sucessfuly'
       })
     } catch (error) {
       next(error)
@@ -202,13 +199,13 @@ const UserController = {
     try {
       const tutors = await User.find({ isTutor: true })
         .populate('subjectsId', {
-          name: 1,
+          name: 1
         })
         .populate('coursesId', {
-          name: 1,
+          name: 1
         })
         .populate('commentaries', {
-          description: 1,
+          description: 1
         })
 
       const mappedTutors = tutors.map(
@@ -221,7 +218,7 @@ const UserController = {
           responseTime,
           coursesId,
           subjectsId,
-          commentaries,
+          commentaries
         }) => ({
           id,
           fullName,
@@ -231,13 +228,13 @@ const UserController = {
           responseTime,
           coursesId,
           commentaries,
-          subjectsId,
+          subjectsId
         })
       )
 
       return res.status(200).json({
         error: false,
-        results: mappedTutors,
+        results: mappedTutors
       })
     } catch (error) {
       console.log({ error })
@@ -254,8 +251,8 @@ const UserController = {
         populate: {
           path: 'author',
           select: 'username imgUrl',
-          model: 'User',
-        },
+          model: 'User'
+        }
       })
 
       if (!tutor || !tutor.isTutor) {
@@ -271,7 +268,7 @@ const UserController = {
         puntuation,
         languages,
         commentaries,
-        responseTime,
+        responseTime
       } = tutor
 
       return res
@@ -286,7 +283,7 @@ const UserController = {
           puntuation,
           languages,
           commentaries,
-          responseTime,
+          responseTime
         })
         .end()
     } catch (error) {
@@ -299,7 +296,7 @@ const UserController = {
       await validateId(req.params)
       const { id } = req.params
       const user = await User.findById(id).populate('favTutors', {
-        url: 1,
+        url: 1
       })
 
       if (user.isTutor) {
@@ -313,7 +310,7 @@ const UserController = {
         imgUrl: user.imgUrl,
         email: user.email,
         urlTutors: user.urlTutors,
-        favTutorsCount: user.favTutors.length,
+        favTutorsCount: user.favTutors.length
       })
     } catch (error) {
       next(error)
@@ -328,7 +325,7 @@ const UserController = {
         .populate({
           path: 'favTutors',
           select: 'username subjectsId url puntuation',
-          populate: { path: 'subjectsId', select: 'name', model: 'Subject' },
+          populate: { path: 'subjectsId', select: 'name', model: 'Subject' }
         })
         .populate('subjectsId', { name: 1 })
 
@@ -337,14 +334,14 @@ const UserController = {
           username,
           subjects: subjectsId.map((sub) => sub.name),
           url,
-          puntuation,
+          puntuation
         }))
       )
 
       return res.status(200).json({
         error: false,
         tutorsCount: tutors.length,
-        favTutors,
+        favTutors
       })
     } catch (error) {
       next(error)
@@ -373,14 +370,14 @@ const UserController = {
   },
   deleteAll: async (req, res, next) => {
     try {
-      await User.deleteMany()
+      await User.deleteMany({})
       return res
         .status(200)
         .json({ error: false, message: 'Users was deleted' })
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 
 module.exports = UserController

@@ -20,7 +20,7 @@ const validator = (module.exports = {
   },
   validateUpdate: (data) => {
     const validate = joi.object({
-      _id: joi.string().required(),
+      id: joi.string().required(),
       name: joi.string().max(40),
       description: joi.string().max(100),
       imgUrl: joi.string()

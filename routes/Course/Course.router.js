@@ -9,14 +9,14 @@ const {
 } = require('../../controllers/Course/Course.controller')
 const router = express.Router()
 
-router.post('/create', createCourse)
+router.post('/', createCourse)
 
 router.get('/:id', oneCourse)
 router.get('/', allCourses)
 
-router.put('/update', updateCourse)
+router.put('/', updateCourse)
 
-router.delete('/delete/:id', deleteOneCourse)
-router.delete('/delete', deleteAll)
+router.delete('/:id', deleteOneCourse)
+router.delete('/', deleteAll)
 
 module.exports = router

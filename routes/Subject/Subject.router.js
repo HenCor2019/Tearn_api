@@ -9,14 +9,14 @@ const {
 } = require('../../controllers/Subject/Subject.controller')
 const router = express.Router()
 
-router.post('/create', createSubject)
+router.post('/', createSubject)
 
 router.get('/:id', oneSubject)
 router.get('/', allSubjects)
 
-router.put('/update', update)
+router.put('/', update)
 
-router.delete('/delete/:id', deleteOne)
-router.delete('/delete', deleteAll)
+router.delete('/:id', deleteOne)
+router.delete('/', deleteAll)
 
 module.exports = router

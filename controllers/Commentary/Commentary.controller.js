@@ -1,5 +1,6 @@
 const Commentary = require('../../models/Commentary.model')
 const User = require('../../models/User.model')
+const { average } = require('../../tools/average.tools')
 const {
   validateCreateComment,
   validateId,
@@ -44,19 +45,20 @@ const CommentaryControler = {
         adressedId
       })
 
+      await newCommentary.save()
+
       userAuthor.commentaries = userAuthor.commentaries.concat(newCommentary)
       tutor.commentaries = tutor.commentaries.concat(newCommentary)
+      tutor.puntuation = await average(tutor.commentaries)
 
       await userAuthor.save()
       await tutor.save()
-
-      await newCommentary.save()
 
       return res
         .status(201)
         .json({
           error: false,
-          message: 'the commentary was created'
+          message: 'The commentary was created'
         })
         .end()
     } catch (error) {
@@ -83,7 +85,27 @@ const CommentaryControler = {
         commentary
       })
     } catch (error) {
-      next(parseError(error))
+      next(error)
+    }
+  },
+  getUserCommentary: async (req, res, next) => {
+    try {
+      await validateId(req.params)
+      const { id: author } = req.params
+      const authorCommentary = await Commentary.findOne({ author })
+      if (!authorCommentary) {
+        throw { name: 'ExistError', message: 'Cannot find commentary' }
+      }
+
+      return res.status(200).json({
+        error: false,
+        id: authorCommentary._id,
+        puntuation: authorCommentary.puntuation,
+        description: authorCommentary.description
+      })
+    } catch (error) {
+      console.log({ error })
+      next(error)
     }
   },
   getTutorCommentaries: async (req, res, next) => {
@@ -115,13 +137,13 @@ const CommentaryControler = {
     try {
       await validateUpdateCommentary(req.body)
 
-      const { id } = req.body
+      const { id: authorId } = req.body
 
-      const commentary = await Commentary.findById(id)
+      const commentary = await Commentary.findOne({ author: authorId })
 
       if (!commentary) {
         throw {
-          name: 'updateError',
+          name: 'UpdateError',
           message: 'Cannot update commentary'
         }
       }
@@ -136,6 +158,11 @@ const CommentaryControler = {
         updatedCommentary
       )
 
+      const tutor = await User.findById(commentary.adressedId)
+      tutor.puntuation = await average(tutor.commentaries)
+
+      await tutor.save()
+
       return res
         .status(200)
         .json({
@@ -144,7 +171,6 @@ const CommentaryControler = {
         })
         .end()
     } catch (error) {
-      console.log({ error })
       next(error)
     }
   },

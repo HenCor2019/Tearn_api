@@ -4,7 +4,7 @@ const {
   validateCreation,
   validateParams,
   validateUpdate,
-  validateDelete,
+  validateDelete
 } = require('./Course.validator')
 
 const CourseController = {
@@ -19,7 +19,7 @@ const CourseController = {
       if (course) {
         throw {
           name: 'ExistError',
-          message: 'Course name already exist',
+          message: 'Course name already exist'
         }
       }
 
@@ -30,20 +30,23 @@ const CourseController = {
         subjectId,
         url: process.env.BASE_URL,
         imgUrl,
-        tutors: [],
+        tutors: []
       })
 
       newCourse.url += `course/${newCourse._id}`
-      subject.courses = [newCourse, ...subject.courses]
 
-      await subject.save()
+      if (subject) {
+        subject.courses = [newCourse, ...subject.courses]
+        await subject.save()
+      }
+
       await newCourse.save()
 
       return res
         .status(201)
         .json({
           error: false,
-          message: 'Course created sucessfuly',
+          message: 'Course created sucessfuly'
         })
         .end()
     } catch (error) {
@@ -60,7 +63,7 @@ const CourseController = {
           url,
           imgUrl,
           subjectId,
-          tutors,
+          tutors
         })
       )
 
@@ -68,7 +71,7 @@ const CourseController = {
         .status(200)
         .json({
           error: false,
-          results: mappedCourses,
+          results: mappedCourses
         })
         .end()
     } catch (error) {
@@ -83,7 +86,7 @@ const CourseController = {
       const course = await Course.findById(id).populate('tutors', {
         fullName: 1,
         imgUrl: 1,
-        url: 1,
+        url: 1
       })
 
       if (!course) throw { name: 'notFoundError', message: 'Course not found' }
@@ -98,7 +101,7 @@ const CourseController = {
           url,
           subjectId,
           tutorsCount: tutors.length,
-          tutors,
+          tutors
         })
         .end()
     } catch (error) {
@@ -112,22 +115,21 @@ const CourseController = {
       const { id } = req.body
 
       const courses = await Course.find({
-        $or: [{ _id: id }, { name: req.body.name }],
+        $or: [{ _id: id }, { name: req.body.name }]
       })
 
-      if (courses.length === 0 || courses.length > 1) {
+      if (courses.length === 0 || courses.length > 1)
         throw {
-          name: 'existError',
-          message: 'Cannot update the course',
+          name: 'ExistError',
+          message: 'Cannot update the course'
         }
-      }
 
       const course = await Course.findById(id)
 
       const newCourse = {
         name: req.body.name || course.name,
         url: req.body.url || course.url,
-        subjectId: req.body.subjectId || course.subjectId,
+        subjectId: req.body.subjectId || course.subjectId
       }
 
       await Course.findOneAndUpdate({ _id: id }, newCourse)
@@ -136,7 +138,7 @@ const CourseController = {
         .status(200)
         .json({
           error: false,
-          message: 'Course was update sucessfuly',
+          message: 'Course was update sucessfuly'
         })
         .end()
     } catch (error) {
@@ -162,19 +164,19 @@ const CourseController = {
 
   deleteAll: async (req, res, next) => {
     try {
-      await Course.deleteMany()
+      await Course.deleteMany({})
 
       return res
         .status(200)
         .json({
           error: false,
-          message: 'Courses was deleted',
+          message: 'Courses was deleted'
         })
         .end()
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 
 module.exports = CourseController

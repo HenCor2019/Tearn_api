@@ -9,14 +9,14 @@ const {
 } = require('../../controllers/Category/Category.controller')
 const router = express.Router()
 
-router.post('/create', createCategory)
+router.post('/', createCategory)
 
 router.get('/:id', oneCategory)
 router.get('/', allCategories)
 
-router.put('/update', update)
+router.put('/', update)
 
-router.delete('/delete/:id', deleteOne)
-router.delete('/delete', deleteAll)
+router.delete('/:id', deleteOne)
+router.delete('/', deleteAll)
 
 module.exports = router

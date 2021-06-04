@@ -17,7 +17,7 @@ const regexExpression = {
       )
 
     return newPattern.join('').toString()
-  },
+  }
 }
 
 module.exports = regexExpression

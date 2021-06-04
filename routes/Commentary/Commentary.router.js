@@ -10,10 +10,10 @@ const {
 const router = express.Router()
 
 /// api/v1/commentary
-router.post('/create', createComentary)
+router.post('/', createComentary)
 router.get('/', getAll)
 router.get('/:id', getCommentary)
 router.get('/tutors/:id', getTutorCommentaries)
-router.put('/update', updateCommentary)
+router.put('/', updateCommentary)
 router.delete('/:id', deleteCommentary)
 module.exports = router

@@ -13,7 +13,7 @@ const randomsCategories = (categoriesId) => {
   const randomsId = [
     categoriesId[randomPosition(categoriesLen)],
     categoriesId[randomPosition(categoriesLen)],
-    categoriesId[randomPosition(categoriesLen)],
+    categoriesId[randomPosition(categoriesLen)]
   ]
   if (new Set(randomsId).size !== 3) return randomsCategories(categoriesId)
   else return randomsId

@@ -1,4 +1,3 @@
-const Category = require('../../models/Category.model')
 const Subject = require('../../models/Subject.model')
 const User = require('../../models/User.model')
 const randomPreferences = require('../../utils/randomPreferences.utils')
@@ -12,7 +11,7 @@ const HomeController = {
         const user = await User.findById(req.params?.id)
         console.log({ user })
         preferences =
-          user?.preferences.length == 0
+          user?.preferences.length === 0
             ? await randomPreferences()
             : user.preferences
       } else preferences = await randomPreferences()

@@ -22,7 +22,7 @@ const validator = {
     const joiValidator = joi.object({
       id: joi.string().required(),
       description: joi.string(),
-      puntuation: joi.string()
+      puntuation: joi.number()
     })
 
     return joiValidator.validateAsync(data)
