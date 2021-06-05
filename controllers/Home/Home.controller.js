@@ -1,6 +1,6 @@
-const Subject = require('../../models/Subject.model')
-const User = require('../../models/User.model')
-const randomPreferences = require('../../utils/randomPreferences.utils')
+const Subject = require("../../models/Subject.model")
+const User = require("../../models/User.model")
+const randomPreferences = require("../../utils/randomPreferences.utils")
 
 const HomeController = {
   landingHome: async (req, res, next) => {
@@ -34,11 +34,12 @@ const HomeController = {
       const tutors = await User.find({
         subjectsId: { $in: preferredSubjectsId }
       })
-        .populate('subjectsId', { name: 1 })
+        .populate("subjectsId", { name: 1 })
         .limit(5)
 
       const mappedTutors = tutors.map(
-        ({ fullName, imgUrl, subjectsId, puntuation, url }) => ({
+        ({ _id: id, fullName, imgUrl, subjectsId, puntuation, url }) => ({
+          id,
           fullName,
           imgUrl,
           puntuation,

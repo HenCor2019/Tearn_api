@@ -83,15 +83,29 @@ const CourseController = {
     try {
       await validateParams(req.params)
       const { id } = req.params
-      const course = await Course.findById(id).populate('tutors', {
-        fullName: 1,
-        imgUrl: 1,
-        url: 1
+      const course = await Course.findById(id).populate({
+        path: 'tutors',
+        select: 'imgUrl fullName url puntuation subjectsId',
+        populate: {
+          path: 'subjectsId',
+          model: 'Subject',
+          select: 'name'
+        }
       })
 
-      if (!course) throw { name: 'notFoundError', message: 'Course not found' }
+      if (!course) throw { name: 'NotFoundError', message: 'Course not found' }
 
-      const { name, url, subjectId, tutors } = course
+      const { name, url, subjectId, tutors, imgUrl } = course
+      const mappedTutors = tutors.map(
+        ({ _id: id, subjectsId, imgUrl, puntuation, fullName, url }) => ({
+          id,
+          subjects: subjectsId.map((subject) => subject.name),
+          puntuation,
+          imgUrl,
+          fullName,
+          url
+        })
+      )
 
       return res
         .status(200)
@@ -99,9 +113,10 @@ const CourseController = {
           error: false,
           name,
           url,
+          imgUrl,
           subjectId,
           tutorsCount: tutors.length,
-          tutors
+          tutors: mappedTutors
         })
         .end()
     } catch (error) {

@@ -6,7 +6,7 @@ const UserSchema = Schema({
   imgUrl: { type: String, required: true },
   preferences: [{ type: Schema.ObjectId, ref: 'Category' }],
   favTutors: [{ type: Schema.ObjectId, ref: 'User' }],
-  urlTutors: { type: String, required: true },
+  urlTutor: { type: String, required: true },
   isTutor: { type: Boolean, required: true },
   fullName: { type: String },
   subjectsId: [{ type: Schema.ObjectId, ref: 'Subject' }],
@@ -19,6 +19,7 @@ const UserSchema = Schema({
   responseTime: { type: String },
   puntuation: { type: Number },
   commentaries: [{ type: Schema.ObjectId, ref: 'Commentary' }],
+  availability: [{ type: String }],
   reports: [{ type: Schema.ObjectId, ref: 'Report' }]
 })
 
