@@ -239,9 +239,18 @@ const UserController = {
           description,
           url,
           responseTime,
-          coursesId,
-          commentaries,
-          subjectsId,
+          coursesId: coursesId.map((course) => ({
+            id: course._id,
+            name: course.name
+          })),
+          commentaries: commentaries.map((comment) => ({
+            id: comment._id,
+            description: comment.description
+          })),
+          subjectsId: subjectsId.map((sub) => ({
+            id: sub._id,
+            name: sub.name
+          })),
           active
         })
       )
@@ -301,7 +310,18 @@ const UserController = {
           description,
           puntuation,
           languages,
-          commentaries,
+          commentaries: commentaries.map(
+            ({ _id: id, description, puntuation, author }) => ({
+              id,
+              description,
+              puntuation,
+              author: {
+                id: author._id,
+                username: author.username,
+                imgUrl: author.imgUrl
+              }
+            })
+          ),
           availability,
           subjectsId,
           responseTime,
