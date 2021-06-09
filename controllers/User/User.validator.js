@@ -26,7 +26,8 @@ const UserValidator = {
       puntuation: joi.number(),
       availability: joi.array().items(joi.number().min(0).max(1)),
       commentary: joi.string(),
-      reports: joi.string()
+      reports: joi.string(),
+      active: joi.bool()
     })
 
     return validate.validateAsync(data)

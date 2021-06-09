@@ -1,20 +1,20 @@
-const User = require("../../models/User.model")
-const jwt = require("jsonwebtoken")
-const Course = require("../../models/Course.model")
-const Subject = require("../../models/Subject.model")
+const User = require('../../models/User.model')
+const jwt = require('jsonwebtoken')
+const Course = require('../../models/Course.model')
+const Subject = require('../../models/Subject.model')
 
 const {
   validateLoginFacebook,
   validateUpdateToTutor,
   validateUpdateNormalUser,
   validateId
-} = require("./User.validator")
+} = require('./User.validator')
 const {
   insertUniqueId,
   insertUniqueIds,
   addOrRemoveFavoriteTutors,
   insertValidAvailability
-} = require("../../utils/user.utils")
+} = require('../../utils/user.utils')
 
 const UserController = {
   loginGoogle: async (req, res, next) => {
@@ -48,7 +48,7 @@ const UserController = {
         const token = jwt.sign(
           { id, newUsername, newEmail, newImgUrl },
           process.env.TOKEN_KEY,
-          { expiresIn: "14d" }
+          { expiresIn: '14d' }
         )
 
         return res.status(201).json({ error: false, accessToken: token }).end()
@@ -65,7 +65,7 @@ const UserController = {
         { id, registerUsername, regiserEmail, registerImgUrl },
         process.env.TOKEN_KEY,
         {
-          expiresIn: "14d"
+          expiresIn: '14d'
         }
       )
 
@@ -77,8 +77,8 @@ const UserController = {
   allUser: async (req, res, next) => {
     try {
       const users = await User.find()
-        .populate("preferences", { name: 1 })
-        .populate("favTutors", { username: 1 })
+        .populate('preferences', { name: 1 })
+        .populate('favTutors', { username: 1 })
 
       const mappedUsers = users.map(
         ({
@@ -117,15 +117,15 @@ const UserController = {
 
       const user = await User.findById(id)
 
-      if (!user) throw { name: "NotFoundError", message: "User not found" }
+      if (!user) throw { name: 'NotFoundError', message: 'User not found' }
 
       const courses = await Course.find({ _id: { $in: coursesId } })
       const subjects = await Subject.find({ _id: { $in: subjectsId } })
 
       if (!subjects.length || !courses.length) {
         throw {
-          name: "InvalidId",
-          message: "Cannot find the subject or course"
+          name: 'InvalidId',
+          message: 'Cannot find the subject or course'
         }
       }
 
@@ -148,7 +148,8 @@ const UserController = {
           req.body?.availability
         ),
         commentaries: insertUniqueId(user.commentaries, req.body?.commentary),
-        reports: insertUniqueId(user.reports, req.body.reports)
+        reports: insertUniqueId(user.reports, req.body.reports),
+        active: req.body.active || true
       }
 
       await User.findOneAndUpdate({ _id: id }, preUpdateUser)
@@ -156,16 +157,20 @@ const UserController = {
 
       for (const courseId of courses) {
         const course = await Course.findById(courseId._id)
-        course.tutors = course.tutors.concat(newTutor)
-        await course.save()
+        if (
+          insertUniqueId(course.tutors, newTutor._id).length !=
+          course.tutors.length
+        ) {
+          course.tutors = [...setTotalTutors]
+          await course.save()
+        }
       }
 
       return res
         .status(200)
-        .json({ error: false, message: "User was updated sucessfuly" })
+        .json({ error: false, message: 'User was updated sucessfuly' })
         .end()
     } catch (error) {
-      console.log({ error })
       next(error)
     }
   },
@@ -177,12 +182,12 @@ const UserController = {
       const tutor = await User.findById(req.body.favTutor)
 
       if (tutor && !tutor?.isTutor) {
-        throw { name: "InvalidTutorError", message: "Cannot find the tutor" }
+        throw { name: 'InvalidTutorError', message: 'Cannot find the tutor' }
       }
 
       const user = await User.findById(id)
 
-      if (!user) throw { name: "NotFoundError", message: "User don't found" }
+      if (!user) throw { name: 'NotFoundError', message: "User don't found" }
 
       const preUpdateUser = {
         username: req.body.username || user.username,
@@ -195,7 +200,7 @@ const UserController = {
 
       return res.status(200).json({
         error: false,
-        message: "User was updated sucessfuly"
+        message: 'User was updated sucessfuly'
       })
     } catch (error) {
       next(error)
@@ -205,13 +210,13 @@ const UserController = {
   allTutor: async (req, res, next) => {
     try {
       const tutors = await User.find({ isTutor: true })
-        .populate("subjectsId", {
+        .populate('subjectsId', {
           name: 1
         })
-        .populate("coursesId", {
+        .populate('coursesId', {
           name: 1
         })
-        .populate("commentaries", {
+        .populate('commentaries', {
           description: 1
         })
 
@@ -225,7 +230,8 @@ const UserController = {
           responseTime,
           coursesId,
           subjectsId,
-          commentaries
+          commentaries,
+          active
         }) => ({
           id,
           fullName,
@@ -235,7 +241,8 @@ const UserController = {
           responseTime,
           coursesId,
           commentaries,
-          subjectsId
+          subjectsId,
+          active
         })
       )
 
@@ -253,24 +260,24 @@ const UserController = {
       await validateId(req.params)
       const { id } = req.params
       const tutor = await User.findById(id).populate({
-        path: "commentaries",
-        select: "description puntuation author",
+        path: 'commentaries',
+        select: 'description puntuation author',
         populate: {
-          path: "author",
-          select: "username imgUrl",
-          model: "User"
+          path: 'author',
+          select: 'username imgUrl',
+          model: 'User'
         }
       })
 
       if (!tutor || !tutor.isTutor) {
-        throw { name: "InvalidTutorError", message: "Cannot find the tutor" }
+        throw { name: 'InvalidTutorError', message: 'Cannot find the tutor' }
       }
 
       const {
         _id,
         fullName,
         imgUrl,
-        url,
+        urlTutor,
         urlCommentaries,
         description,
         puntuation,
@@ -278,7 +285,8 @@ const UserController = {
         commentaries,
         availability,
         subjectsId,
-        responseTime
+        responseTime,
+        active
       } = tutor
 
       return res
@@ -288,7 +296,7 @@ const UserController = {
           id: _id,
           fullName,
           imgUrl,
-          url,
+          urlTutor,
           urlCommentaries,
           description,
           puntuation,
@@ -296,7 +304,8 @@ const UserController = {
           commentaries,
           availability,
           subjectsId,
-          responseTime
+          responseTime,
+          active
         })
         .end()
     } catch (error) {
@@ -306,14 +315,15 @@ const UserController = {
   },
   oneUser: async (req, res, next) => {
     try {
+      console.log('que indas')
       await validateId(req.params)
       const { id } = req.params
-      const user = await User.findById(id).populate("favTutors", {
+      const user = await User.findById(id).populate('favTutors', {
         url: 1
       })
 
       if (user.isTutor) {
-        throw { name: "NotFoundError", message: "Can't find the user" }
+        throw { name: 'NotFoundError', message: "Can't find the user" }
       }
 
       return res.status(200).json({
@@ -337,27 +347,28 @@ const UserController = {
 
       const tutors = await User.find({ _id })
         .populate({
-          path: "favTutors",
-          select: "username subjectsId url puntuation",
-          populate: { path: "subjectsId", select: "name", model: "Subject" }
+          path: 'favTutors',
+          select: 'username subjectsId url puntuation',
+          populate: { path: 'subjectsId', select: 'name', model: 'Subject' }
         })
-        .populate("subjectsId", { name: 1 })
+        .populate('subjectsId', { name: 1 })
 
       const favTutors = tutors.map(({ favTutors }) =>
-        favTutors.map(({ username, subjectsId, url, puntuation }) => ({
+        favTutors.map(({ _id: id, username, puntuation, subjectsId }) => ({
+          id,
           username,
-          subjects: subjectsId.map((sub) => sub.name),
-          url,
-          puntuation
+          puntuation,
+          subjects: subjectsId.map((s) => s.name)
         }))
       )
 
       return res.status(200).json({
         error: false,
-        tutorsCount: tutors.length,
-        favTutors
+        tutorsCount: favTutors.length,
+        favTutors: favTutors.reduce((acc, current) => acc.concat(current), [])
       })
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   },
@@ -369,14 +380,14 @@ const UserController = {
 
       const user = await User.findById(id)
       if (!user) {
-        throw { name: "InvalidTutorError", message: "Cannot find the tutor" }
+        throw { name: 'InvalidTutorError', message: 'Cannot find the tutor' }
       }
 
       await User.findOneAndDelete({ _id: id })
 
       return res
         .status(200)
-        .json({ error: false, message: "User was deleted" })
+        .json({ error: false, message: 'User was deleted' })
         .end()
     } catch (error) {
       next(error)
@@ -387,7 +398,7 @@ const UserController = {
       await User.deleteMany({})
       return res
         .status(200)
-        .json({ error: false, message: "Users was deleted" })
+        .json({ error: false, message: 'Users was deleted' })
     } catch (error) {
       next(error)
     }

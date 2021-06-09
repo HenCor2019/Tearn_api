@@ -1,6 +1,6 @@
 const utils = {
   insertUniqueId: (userArr = [], newData) => {
-    if (!newData || userArr.findIndex((data) => data === newData) !== -1) {
+    if (!newData || userArr.findIndex((data) => data.toString() === newData.toString()) !== -1) {
       return userArr
     }
     return [newData, ...userArr]

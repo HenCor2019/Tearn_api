@@ -1,4 +1,5 @@
 const Subject = require("../../models/Subject.model")
+const Course = require("../../models/Course.model")
 const User = require("../../models/User.model")
 const randomPreferences = require("../../utils/randomPreferences.utils")
 
@@ -18,7 +19,7 @@ const HomeController = {
 
       const preferredSubject = await Subject.find({
         categoryId: { $in: preferences }
-      }).limit(5)
+      }).limit(7)
 
       const filteredSubjects = preferredSubject.map(
         ({ _id: id, name, courses, url }) => ({
@@ -35,7 +36,11 @@ const HomeController = {
         subjectsId: { $in: preferredSubjectsId }
       })
         .populate("subjectsId", { name: 1 })
-        .limit(5)
+        .limit(7)
+
+      const courses = await Course.find({
+        subjectId: { $in: preferredSubjectsId }
+      }).limit(7)
 
       const mappedTutors = tutors.map(
         ({ _id: id, fullName, imgUrl, subjectsId, puntuation, url }) => ({
@@ -47,11 +52,20 @@ const HomeController = {
           subjects: subjectsId.map(({ name }) => name)
         })
       )
+      const mappedCourses = courses.map(({ name, _id: id, tutors }) => ({
+        id,
+        name,
+        tutorCount: tutors.length
+      }))
 
       return res.status(200).json({
         error: false,
+        tutorCount: mappedTutors.length,
+        subjectCount: filteredSubjects.length,
+        courseCount: mappedCourses.length,
         subjects: filteredSubjects,
-        tutors: mappedTutors
+        tutors: mappedTutors,
+        courses: mappedCourses
       })
     } catch (error) {
       console.log({ error })
