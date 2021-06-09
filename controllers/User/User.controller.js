@@ -348,18 +348,21 @@ const UserController = {
       const tutors = await User.find({ _id })
         .populate({
           path: 'favTutors',
-          select: 'username subjectsId url puntuation',
+          select: 'username subjectsId url puntuation imgUrl',
           populate: { path: 'subjectsId', select: 'name', model: 'Subject' }
         })
         .populate('subjectsId', { name: 1 })
 
       const favTutors = tutors.map(({ favTutors }) =>
-        favTutors.map(({ _id: id, username, puntuation, subjectsId }) => ({
-          id,
-          username,
-          puntuation,
-          subjects: subjectsId.map((s) => s.name)
-        }))
+        favTutors.map(
+          ({ _id: id, username, puntuation, subjectsId, imgUrl }) => ({
+            id,
+            username,
+            puntuation,
+            imgUrl,
+            subjects: subjectsId.map((s) => s.name)
+          })
+        )
       )
 
       return res.status(200).json({
