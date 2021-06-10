@@ -179,7 +179,7 @@ const CommentaryControler = {
       await validateId(req.params)
       const { id } = req.params
 
-      await Commentary.findOneAndDelete(id)
+      await Commentary.findOneAndDelete({ _id:id })
 
       return res.status(200).json({
         error: false,

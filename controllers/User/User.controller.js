@@ -161,7 +161,7 @@ const UserController = {
           insertUniqueId(course.tutors, newTutor._id).length !=
           course.tutors.length
         ) {
-          course.tutors = [...setTotalTutors]
+          course.tutors = course.tutors.concat(newTutor)
           await course.save()
         }
       }
@@ -171,6 +171,7 @@ const UserController = {
         .json({ error: false, message: 'User was updated sucessfuly' })
         .end()
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   },
