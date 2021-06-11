@@ -2,10 +2,9 @@ const joi = require('joi')
 
 const validator = {
   validateCreateComment: (body) => {
-    // creating joi object
     const joiValidator = joi.object({
       description: joi.string().required(),
-      puntuation: joi.number().required(),
+      puntuation: joi.number().required().min(1).max(5),
       author: joi.string().required(),
       adressedId: joi.string().required()
     })

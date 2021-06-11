@@ -1,7 +1,7 @@
-const Subject = require("../../models/Subject.model")
-const Course = require("../../models/Course.model")
-const User = require("../../models/User.model")
-const randomPreferences = require("../../utils/randomPreferences.utils")
+const Subject = require('../../models/Subject.model')
+const Course = require('../../models/Course.model')
+const User = require('../../models/User.model')
+const randomPreferences = require('../../utils/randomPreferences.utils')
 
 const HomeController = {
   landingHome: async (req, res, next) => {
@@ -10,11 +10,11 @@ const HomeController = {
 
       if (req.params?.id) {
         const user = await User.findById(req.params?.id)
-        console.log({ user })
+
         preferences =
-          user?.preferences.length === 0
+          user?.preferences?.length === 0
             ? await randomPreferences()
-            : user.preferences
+            : user?.preferences ?? (await randomPreferences())
       } else preferences = await randomPreferences()
 
       const preferredSubject = await Subject.find({
@@ -35,7 +35,7 @@ const HomeController = {
       const tutors = await User.find({
         subjectsId: { $in: preferredSubjectsId }
       })
-        .populate("subjectsId", { name: 1 })
+        .populate('subjectsId', { name: 1 })
         .limit(7)
 
       const courses = await Course.find({
@@ -68,7 +68,6 @@ const HomeController = {
         courses: mappedCourses
       })
     } catch (error) {
-      console.log({ error })
       next(error)
     }
   }

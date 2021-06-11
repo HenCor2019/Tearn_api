@@ -23,9 +23,11 @@ const UserController = {
 
       const { username, email, imgUrl } = req.body
 
-      const user = await User.find({ $or: [{ username }, { email }] })
+      const user = await User.find({ $and: [{ username }, { email }] })
+      console.log({ user })
 
-      if (user.length > 1) next()
+      if (user.length > 1)
+        throw { name: 'ErrorInternal', message: 'Internal error' }
 
       if (user.length === 0) {
         const newUser = new User({
@@ -38,39 +40,61 @@ const UserController = {
         })
         newUser.url = `${process.env.BASE_URL}user/${newUser._id}`
 
-        const {
-          _id: id,
-          username: newUsername,
-          email: newEmail,
-          imgUrl: newImgUrl
-        } = await newUser.save()
+        const { _id: newUserId } = await newUser.save()
 
         const token = jwt.sign(
-          { id, newUsername, newEmail, newImgUrl },
-          process.env.TOKEN_KEY,
-          { expiresIn: '14d' }
+          {
+            id: newUserId,
+            username,
+            email,
+            imgUrl,
+            isTutor: false
+          },
+          process.env.TOKEN_KEY
         )
 
-        return res.status(201).json({ error: false, accessToken: token }).end()
+        return res
+          .status(201)
+          .json({
+            error: false,
+            accessToken: token,
+            id: newUserId,
+            username,
+            email,
+            imgUrl
+          })
+          .end()
       }
 
-      const {
-        _id: id,
-        username: registerUsername,
-        email: regiserEmail,
-        imgUrl: registerImgUrl
-      } = user
+      const { _id: userId, isTutor, fullName = 'none' } = user[0]
+      console.log({ userId })
 
       const token = jwt.sign(
-        { id, registerUsername, regiserEmail, registerImgUrl },
-        process.env.TOKEN_KEY,
         {
-          expiresIn: '14d'
-        }
+          id: userId,
+          username,
+          email,
+          imgUrl,
+          isTutor: user.isTutor
+        },
+        process.env.TOKEN_KEY
       )
 
-      return res.status(200).json({ error: false, accessToken: token }).end()
+      return res
+        .status(200)
+        .json({
+          error: false,
+          accessToken: token,
+          id: userId,
+          username,
+          email,
+          imgUrl,
+          isTutor,
+          fullName
+        })
+        .end()
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   },
@@ -336,14 +360,13 @@ const UserController = {
   },
   oneUser: async (req, res, next) => {
     try {
-      console.log('que indas')
       await validateId(req.params)
       const { id } = req.params
       const user = await User.findById(id).populate('favTutors', {
         url: 1
       })
 
-      if (user.isTutor) {
+      if (!user) {
         throw { name: 'NotFoundError', message: "Can't find the user" }
       }
 

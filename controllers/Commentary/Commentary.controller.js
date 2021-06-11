@@ -29,7 +29,9 @@ const CommentaryControler = {
           message: 'Cannot find the author or tutor'
         }
       }
-      const commentary = await Commentary.findOne({ author })
+      const commentary = await Commentary.findOne({
+        $and: [{ author }, { adressedId }]
+      })
 
       if (commentary) {
         throw {
@@ -47,11 +49,9 @@ const CommentaryControler = {
 
       await newCommentary.save()
 
-      userAuthor.commentaries = userAuthor.commentaries.concat(newCommentary)
       tutor.commentaries = tutor.commentaries.concat(newCommentary)
       tutor.puntuation = await average(tutor.commentaries)
 
-      await userAuthor.save()
       await tutor.save()
 
       return res
@@ -179,7 +179,7 @@ const CommentaryControler = {
       await validateId(req.params)
       const { id } = req.params
 
-      await Commentary.findOneAndDelete({ _id:id })
+      await Commentary.findOneAndDelete({ _id: id })
 
       return res.status(200).json({
         error: false,
