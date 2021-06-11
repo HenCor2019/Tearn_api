@@ -179,6 +179,15 @@ const CommentaryControler = {
       await validateId(req.params)
       const { id } = req.params
 
+      const { adressedId: tutorId } = await Commentary.findById(id)
+      const tutor = await User.findById(tutorId)
+      const filterCommentaries = tutor.commentaries.filter(
+        (comment) => comment != id
+      )
+      tutor.commentaries = filterCommentaries
+      tutor.puntuation = await average(filterCommentaries)
+
+      await tutor.save()
       await Commentary.findOneAndDelete({ _id: id })
 
       return res.status(200).json({
@@ -186,6 +195,7 @@ const CommentaryControler = {
         message: 'Commentary was delete'
       })
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   }
