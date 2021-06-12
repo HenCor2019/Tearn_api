@@ -23,13 +23,9 @@ const UserController = {
 
       const { username, email, imgUrl } = req.body
 
-      const user = await User.find({ $and: [{ username }, { email }] })
-      console.log({ user })
+      const user = await User.findOne({ $and: [{ username }, { email }] })
 
-      if (user.length > 1)
-        throw { name: 'ErrorInternal', message: 'Internal error' }
-
-      if (user.length === 0) {
+      if (!user) {
         const newUser = new User({
           username,
           email,
@@ -48,7 +44,9 @@ const UserController = {
             username,
             email,
             imgUrl,
-            isTutor: false
+            isTutor: false,
+            favTutors: [],
+            preferences: []
           },
           process.env.TOKEN_KEY
         )
@@ -66,8 +64,13 @@ const UserController = {
           .end()
       }
 
-      const { _id: userId, isTutor, fullName = 'none' } = user[0]
-      console.log({ userId })
+      const {
+        _id: userId,
+        isTutor,
+        fullName = 'none',
+        preferences,
+        favTutors
+      } = user
 
       const token = jwt.sign(
         {
@@ -90,7 +93,9 @@ const UserController = {
           email,
           imgUrl,
           isTutor,
-          fullName
+          fullName,
+          preferences,
+          favTutors
         })
         .end()
     } catch (error) {
@@ -225,9 +230,12 @@ const UserController = {
 
       return res.status(200).json({
         error: false,
-        message: 'User was updated sucessfuly'
+        message: 'User was updated sucessfuly',
+        isFavorite: preUpdateUser.favTutors.length > user.favTutors,
+        favTutors: preUpdateUser.favTutors
       })
     } catch (error) {
+      console.log({ error })
       next(error)
     }
   },
@@ -362,10 +370,7 @@ const UserController = {
     try {
       await validateId(req.params)
       const { id } = req.params
-      const user = await User.findById(id).populate('favTutors', {
-        url: 1
-      })
-
+      const user = await User.findById(id)
       if (!user) {
         throw { name: 'NotFoundError', message: "Can't find the user" }
       }
@@ -378,7 +383,8 @@ const UserController = {
         email: user.email,
         urlTutor: user.urlTutor,
         url: user.url,
-        favTutorsCount: user.favTutors.length
+        favTutorsCount: user.favTutors.length,
+        favTutors: user.favTutors
       })
     } catch (error) {
       next(error)
