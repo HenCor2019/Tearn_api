@@ -13,7 +13,8 @@ const {
   insertUniqueId,
   insertUniqueIds,
   addOrRemoveFavoriteTutors,
-  insertOrRemoveSkills
+  insertOrRemove,
+  areValidUpdate
 } = require('../../utils/user.utils')
 
 const UserController = {
@@ -166,13 +167,13 @@ const UserController = {
         dot: req.body.dot || user.dot,
         urlTutor: `${process.env.BASE_URL}user/tutor/${user._id}`,
         urlCommentaries: `${process.env.BASE_URL}commentary/tutors/${user._id}`,
-        languages: insertOrRemoveSkills(user.languages, req.body?.languages),
-        subjectsId: insertUniqueIds(user.subjectsId, req.body?.subjectsId),
-        coursesId: insertUniqueIds(user.coursesId, req.body?.coursesId),
+        languages: insertOrRemove(user.languages, req.body?.languages),
+        subjectsId: insertOrRemove(user.subjectsId, req.body?.subjectsId),
+        coursesId: insertOrRemove(user.coursesId, req.body?.coursesId),
         description: req.body.description || user.description,
         responseTime: req.body.responseTime || user.responseTime,
         puntuation: req.body.puntuation || user.puntuation || 0,
-        availability: insertOrRemoveSkills(
+        availability: insertOrRemove(
           user?.availability,
           req.body?.availability
         ),
@@ -181,8 +182,8 @@ const UserController = {
         active: req.body.active || true
       }
 
-      if (!preUpdateUser.languages.length || !preUpdateUser.availability.length)
-        throw { name: 'InvalidSkillsError', message: 'Skill cannot be empty' }
+      if (!areValidUpdate(preUpdateUser))
+        throw { name: 'InvalidDataError', message: 'Cannot be empty' }
 
       await User.findOneAndUpdate({ _id: id }, preUpdateUser)
       const newTutor = await User.findById(id)

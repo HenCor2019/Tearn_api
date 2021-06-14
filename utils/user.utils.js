@@ -33,14 +33,24 @@ const utils = {
       ? [...tutorArr, newIdTutor]
       : filteredTutors
   },
-  insertOrRemoveSkills: (skills = [], newSkills = undefined) => {
-    if (!newSkills) return skills
-    const regexNewSkills = new RegExp(newSkills.join(''), 'i')
-    const filterSkills = skills.filter(
-      (skill) => !skill.toLowerCase().match(regexNewSkills)
+  insertOrRemove: (data = [], newData = undefined) => {
+    if (!newData) return skills
+    const regexNewData = new RegExp(newData.join('|'), 'i')
+    const filterData = data.filter(
+      (d) => !d.toString().toLowerCase().match(regexNewData)
     )
-    if (filterSkills.length === skills.length) return [...skills, ...newSkills]
-    return filterSkills
+    if (filterData.length === data.length) return [...data, ...newData]
+    return filterData
+  },
+  areValidUpdate: (user) => {
+    if (
+      !user.languages.length ||
+      !user.availability.length ||
+      !user.subjectsId.length ||
+      !user.coursesId.length
+    )
+      return false
+    return true
   }
 }
 
