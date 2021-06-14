@@ -386,6 +386,7 @@ const UserController = {
         username: user.username,
         imgUrl: user.imgUrl,
         email: user.email,
+        isTutor: user.isTutor,
         urlTutor: user.urlTutor,
         url: user.url,
         favTutorsCount: user.favTutors.length,
