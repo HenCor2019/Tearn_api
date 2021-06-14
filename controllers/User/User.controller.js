@@ -172,7 +172,7 @@ const UserController = {
         description: req.body.description || user.description,
         responseTime: req.body.responseTime || user.responseTime,
         puntuation: req.body.puntuation || user.puntuation || 0,
-        availability: insertValidAvailability(
+        availability: insertUniqueIds(
           user?.availability,
           req.body?.availability
         ),

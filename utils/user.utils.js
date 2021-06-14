@@ -12,7 +12,6 @@ const utils = {
   insertUniqueIds: (userArr = [], newArr = []) => {
     let newUniqueData = []
     if (!newArr?.length) {
-      console.log({ userArr, newArr })
       newUniqueData = new Set([...userArr])
       return [...newUniqueData]
     }
@@ -22,8 +21,6 @@ const utils = {
         ...userArr.map((id) => id.toString())
       ])
     else newUniqueData = new Set([...newArr])
-
-    console.log({ newUniqueData })
 
     return [...newUniqueData]
   },

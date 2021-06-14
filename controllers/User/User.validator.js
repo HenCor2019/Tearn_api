@@ -24,7 +24,7 @@ const UserValidator = {
       description: joi.string().required(),
       responseTime: joi.string().required(),
       puntuation: joi.number(),
-      availability: joi.array().items(joi.number().min(0).max(1)),
+      availability: joi.array().items(joi.string()),
       commentary: joi.string(),
       reports: joi.string(),
       active: joi.bool()
