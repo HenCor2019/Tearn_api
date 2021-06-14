@@ -167,7 +167,7 @@ const UserController = {
         dot: req.body.dot || user.dot,
         urlTutor: `${process.env.BASE_URL}user/tutor/${user._id}`,
         urlCommentaries: `${process.env.BASE_URL}commentary/tutors/${user._id}`,
-        languages: req.body.language || user.languages,
+        languages: req.body.languages || user.languages,
         subjectsId: req.body.subjectsId || user.subjectsId,
         coursesId: req.body.coursesId || user.coursesId,
         description: req.body.description || user.description,
