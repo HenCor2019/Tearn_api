@@ -327,7 +327,9 @@ const UserController = {
         commentaries,
         availability,
         subjectsId,
+        coursesId,
         responseTime,
+        dot,
         active
       } = tutor
 
@@ -357,7 +359,9 @@ const UserController = {
           ),
           availability,
           subjectsId,
+          coursesId,
           responseTime,
+          dot,
           active
         })
         .end()
