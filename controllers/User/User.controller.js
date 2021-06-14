@@ -167,16 +167,13 @@ const UserController = {
         dot: req.body.dot || user.dot,
         urlTutor: `${process.env.BASE_URL}user/tutor/${user._id}`,
         urlCommentaries: `${process.env.BASE_URL}commentary/tutors/${user._id}`,
-        languages: insertOrRemove(user.languages, req.body?.languages),
-        subjectsId: insertOrRemove(user.subjectsId, req.body?.subjectsId),
-        coursesId: insertOrRemove(user.coursesId, req.body?.coursesId),
+        languages: req.body.language || user.languages,
+        subjectsId: req.body.subjectsId || user.subjectsId,
+        coursesId: req.body.coursesId || user.coursesId,
         description: req.body.description || user.description,
         responseTime: req.body.responseTime || user.responseTime,
         puntuation: req.body.puntuation || user.puntuation || 0,
-        availability: insertOrRemove(
-          user?.availability,
-          req.body?.availability
-        ),
+        availability: req.body.availability || user.availability,
         commentaries: insertUniqueId(user.commentaries, req.body?.commentary),
         reports: insertUniqueId(user.reports, req.body.reports),
         active: req.body.active || true
