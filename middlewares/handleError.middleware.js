@@ -22,6 +22,8 @@ const ERROR_HANDLERS = {
   ValidationError: (res, { message }) =>
     res.status(400).json({ error: true, message }).end(),
 
+  InvalidSkillsError: (res, { message }) =>
+    res.status(400).json({ error: true, message }).end(),
   defaultError: (res, error) => {
     console.error(error.name)
     return res

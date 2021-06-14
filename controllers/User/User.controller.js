@@ -13,7 +13,7 @@ const {
   insertUniqueId,
   insertUniqueIds,
   addOrRemoveFavoriteTutors,
-  insertValidAvailability
+  insertOrRemoveSkills
 } = require('../../utils/user.utils')
 
 const UserController = {
@@ -166,13 +166,13 @@ const UserController = {
         dot: req.body.dot || user.dot,
         urlTutor: `${process.env.BASE_URL}user/tutor/${user._id}`,
         urlCommentaries: `${process.env.BASE_URL}commentary/tutors/${user._id}`,
-        languages: insertUniqueIds(user.languages, req.body?.languages),
+        languages: insertOrRemoveSkills(user.languages, req.body?.languages),
         subjectsId: insertUniqueIds(user.subjectsId, req.body?.subjectsId),
         coursesId: insertUniqueIds(user.coursesId, req.body?.coursesId),
         description: req.body.description || user.description,
         responseTime: req.body.responseTime || user.responseTime,
         puntuation: req.body.puntuation || user.puntuation || 0,
-        availability: insertUniqueIds(
+        availability: insertOrRemoveSkills(
           user?.availability,
           req.body?.availability
         ),
@@ -180,6 +180,9 @@ const UserController = {
         reports: insertUniqueId(user.reports, req.body.reports),
         active: req.body.active || true
       }
+
+      if (!preUpdateUser.languages.length || !preUpdateUser.availability.length)
+        throw { name: 'InvalidSkillsError', message: 'Skill cannot be empty' }
 
       await User.findOneAndUpdate({ _id: id }, preUpdateUser)
       const newTutor = await User.findById(id)

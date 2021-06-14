@@ -33,21 +33,14 @@ const utils = {
       ? [...tutorArr, newIdTutor]
       : filteredTutors
   },
-  insertValidAvailability: (
-    availabilities = [],
-    newAvailabilites = undefined
-  ) => {
-    const AVAILABILITIES = ['VIRTUAL', 'PRESENCIAL']
-    if (
-      !newAvailabilites ||
-      !newAvailabilites.filter((availability) => availability != 0).length ||
-      !newAvailabilites.length
+  insertOrRemoveSkills: (skills = [], newSkills = undefined) => {
+    if (!newSkills) return skills
+    const regexNewSkills = new RegExp(newSkills.join(''), 'i')
+    const filterSkills = skills.filter(
+      (skill) => !skill.toLowerCase().match(regexNewSkills)
     )
-      return !availabilities.length ? [AVAILABILITIES[0]] : availabilities
-    return [
-      newAvailabilites[0] == 1 ? AVAILABILITIES[0] : '',
-      newAvailabilites[1] == 1 ? AVAILABILITIES[1] : ''
-    ].filter((aval) => aval != '')
+    if (filterSkills.length === skills.length) return [...skills, ...newSkills]
+    return filterSkills
   }
 }
 
